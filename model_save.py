@@ -1,18 +1,22 @@
-import pandas as pd
-
 import re
 import unicodedata
+
 import nltk
+import numpy as np
+import pandas as pd
+import tensorflow as tf
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Embedding, GlobalAveragePooling1D
 
 df = pd.read_csv("MovieReview.csv")
-display(df.head())
 print(df.shape)
 
 df = df.drop('sentiment', axis=1)
 
-nltk.download()
+nltk.download('stopwords', quiet=True)
+nltk.download('punkt_tab', quiet=True)
 stop_words = stopwords.words('english')
 
 # Converts the unicode file to ascii
@@ -36,18 +40,13 @@ def preprocess_sentence(w):
     return ' '.join(mots).strip()
 
 df.review = df.review.apply(lambda x :preprocess_sentence(x))
-df.head()
 
-import tensorflow as tf
 tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=10000)
 tokenizer.fit_on_texts(df.review)
 
 word2idx = tokenizer.word_index
 idx2word = tokenizer.index_word
 vocab_size = tokenizer.num_words
-
-import numpy as np
-
 
 def sentenceToData(tokens, WINDOW_SIZE):
     window = np.concatenate((np.arange(-WINDOW_SIZE,0),np.arange(1,WINDOW_SIZE+1)))
@@ -73,9 +72,6 @@ for review in df.review:
 X = np.array(X).astype(int)
 y = np.array(Y).astype(int).reshape([-1,1])
 
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Embedding, Dense, GlobalAveragePooling1D
-
 embedding_dim = 300
 model = Sequential()
 model.add(Embedding(vocab_size, embedding_dim))
@@ -85,4 +81,4 @@ model.add(Dense(vocab_size, activation='softmax'))
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.fit(X, y, batch_size = 128, epochs=50)
 
-model.save("word2vec.h5") 
+model.save("word2vec.h5")
