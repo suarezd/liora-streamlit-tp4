@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -7,10 +9,12 @@ from tensorflow.keras.layers import Dense, Embedding, GlobalAveragePooling1D
 
 st.title("Modèle Word2Vec")
 
+BASE_DIR = Path(__file__).resolve().parent
+
 
 @st.cache_resource
 def load_resources():
-    vocab = pd.read_csv("vocab.csv", keep_default_na=False)
+    vocab = pd.read_csv(BASE_DIR / "vocab.csv", keep_default_na=False)
     word2idx = {}
     idx2word = {}
     for i in range(len(vocab)):
@@ -27,7 +31,7 @@ def load_resources():
     model.add(Dense(vocab_size, activation='softmax'))
     model.build(input_shape=(None, 4))
 
-    model.load_weights("word2vec.h5")
+    model.load_weights(BASE_DIR / "word2vec.h5")
 
     vectors = model.layers[0].trainable_weights[0].numpy()
     return vectors, word2idx, idx2word, vocab_size

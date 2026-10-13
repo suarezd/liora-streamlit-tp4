@@ -1,5 +1,3 @@
 __pycache__/
 .venv/
-*.h5
-vocab.csv
 nltk_data/
