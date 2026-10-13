@@ -48,6 +48,8 @@ word2idx = tokenizer.word_index
 idx2word = tokenizer.index_word
 vocab_size = tokenizer.num_words
 
+pd.DataFrame({"word": list(word2idx.keys()), "index": list(word2idx.values())}).to_csv("vocab.csv", index=False)
+
 def sentenceToData(tokens, WINDOW_SIZE):
     window = np.concatenate((np.arange(-WINDOW_SIZE,0),np.arange(1,WINDOW_SIZE+1)))
     X,Y=([],[])
